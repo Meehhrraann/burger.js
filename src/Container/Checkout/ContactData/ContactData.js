@@ -89,20 +89,7 @@ class ContactData extends Component {
       orderData: formData,
     };
 
-    this.props.onOrderBurger(order);
-    // let isMounted = true;
-    // if (isMounted) {
-    //   axios
-
-    //     .post("/orders.json", order)
-    //     .then((response) => {
-    //       this.setState({ loading: false, tprice: 4 });
-    //       this.props.history.push("/");
-    //     })
-    //     .catch((error) => this.setState({ loading: false }));
-
-    //   isMounted = false;
-    // }
+    this.props.onOrderBurger(order, this.props.token);
   };
 
   inputChangedHandler = (event, elementId) => {
@@ -190,12 +177,14 @@ const mapStateToProps = (state) => {
     ings: state.burgerBuilder.ingredients,
     tprice: state.burgerBuilder.total_price,
     loading: state.order.loading,
+    token: state.auth.token,
   };
 };
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    onOrderBurger: (orderData) => dispatch(actions.purchaseBurger(orderData)),
+    onOrderBurger: (orderData, token) =>
+      dispatch(actions.purchaseBurger(orderData, token)),
   };
 };
 

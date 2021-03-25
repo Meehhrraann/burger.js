@@ -29,6 +29,8 @@ function reducer(state = initialState, action) {
     case actionTypes.PURCHASE_BURGER_FAIL:
       return {
         ...state,
+        error: action.error,
+
         loading: false,
       };
     case actionTypes.PURCHASE_BURGER_INIT:
