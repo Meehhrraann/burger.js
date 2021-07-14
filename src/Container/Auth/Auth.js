@@ -5,6 +5,8 @@ import Input from "../../Components/UI/Input/Input";
 import Button from "../../Components/UI/Button/Button";
 import Spinner from "../../Components/UI/Spinner/Spinner";
 import * as actions from "../../store/actions/index";
+import { Redirect } from "react-router-dom";
+import { inputCheckValidity } from "../../shared/utility";
 
 class Auth extends Component {
   state = {
@@ -35,22 +37,11 @@ class Auth extends Component {
     isSingUp: true,
   };
 
-  inputValidity = (value, needValidation) => {
-    let isValid = true;
-    if (needValidation.required) {
-      isValid = value.trim() !== "" && isValid;
+  componentDidMount() {
+    if (!this.props.burgerBuilding && this.props.authRedirectPath !== "/") {
+      this.props.onSetAuthRedirectPath("/");
     }
-
-    if (needValidation.minLenght) {
-      isValid = needValidation.minLenght <= value.length && isValid;
-    }
-
-    if (needValidation.maxLenght) {
-      isValid = needValidation.maxLenght >= value.length && isValid;
-    }
-
-    return isValid;
-  };
+  }
 
   switchSingningModeHandler = () => {
     this.setState((prevState) => {
@@ -64,7 +55,7 @@ class Auth extends Component {
       [loginItem]: {
         ...this.state.loginForm[loginItem],
         value: event.target.value,
-        valid: this.inputValidity(
+        valid: inputCheckValidity(
           event.target.value,
           this.state.loginForm[loginItem].validation
         ),
@@ -114,10 +105,16 @@ class Auth extends Component {
       errorMessage = <p>{this.props.error.message}</p>;
     }
 
+    let redirectToHomeAfterSignin = null;
+    if (this.props.isAuthenticated) {
+      redirectToHomeAfterSignin = <Redirect to={this.props.authRedirectPath} />;
+    }
+    console.log(this.props.authRedirectPath);
     return (
       <div className={classes.Auth}>
+        {redirectToHomeAfterSignin}
+        {errorMessage}
         <form onSubmit={this.submitHandler}>
-          {errorMessage}
           {form}
           <Button btnType="Success">Submite</Button>
         </form>
@@ -133,6 +130,9 @@ const mapStateToPops = (state) => {
   return {
     loading: state.auth.loading,
     error: state.auth.error,
+    isAuthenticated: state.auth.token !== null,
+    burgerBuilding: state.burgerBuilder.building,
+    authRedirectPath: state.auth.authRedirectPath,
   };
 };
 
@@ -140,6 +140,8 @@ const mapDispatchToProps = (dispatch) => {
   return {
     onAuth: (email, password, isSingUp) =>
       dispatch(actions.auth(email, password, isSingUp)),
+    onSetAuthRedirectPath: (path) =>
+      dispatch(actions.setAuthRedirectPath(path)),
   };
 };
 

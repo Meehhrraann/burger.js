@@ -10,7 +10,7 @@ import withErrorHandler from "../hoc/whithErrorHandler/withErrorHandler";
 import { connect } from "react-redux";
 import * as actions from ".././store/actions/index";
 
-class BurgerBuilder extends Component {
+export class BurgerBuilder extends Component {
   state = {
     // NOTE this is obj ---> transform to array in Burger
     purchasable: false,
@@ -84,7 +84,12 @@ class BurgerBuilder extends Component {
   // };
 
   wantToPurchasing = () => {
-    this.setState({ purchasing: true });
+    if (this.props.isAuthenticated) {
+      this.setState({ purchasing: true });
+    } else {
+      this.props.onSetAuthRedirectPath("/checkout");
+      this.props.history.push("/auth");
+    }
   };
 
   cancelPurchasing = () => {
@@ -119,6 +124,7 @@ class BurgerBuilder extends Component {
             price={this.props.tprice}
             purchasable={this.updatePurchesState(this.props.ings)}
             wantToPurchasing={this.wantToPurchasing}
+            isAuthenticated={this.props.isAuthenticated}
           />
         </Aux>
       );
@@ -151,6 +157,7 @@ const mapStateToProps = (state) => {
     ings: state.burgerBuilder.ingredients,
     tprice: state.burgerBuilder.total_price,
     error: state.burgerBuilder.error,
+    isAuthenticated: state.auth.token !== null,
   };
 };
 
@@ -161,6 +168,8 @@ const mapDispatchToProps = (dispatch) => {
       dispatch(actions.removeIngredient(ingName)),
     onInitIngredients: () => dispatch(actions.initInredients()),
     onInitPurchased: () => dispatch(actions.purchaseInit()),
+    onSetAuthRedirectPath: (path) =>
+      dispatch(actions.setAuthRedirectPath(path)),
   };
 };
 

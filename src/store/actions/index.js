@@ -3,6 +3,7 @@ export {
   removeIngredient,
   initInredients,
 } from "./burgerBuilder";
+
 export { purchaseBurger, purchaseInit, fetchOrder } from "./order";
 
-export { auth } from "./auth";
+export { auth, logout, setAuthRedirectPath, checkForAutoAuth } from "./auth";
